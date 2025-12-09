@@ -9,3 +9,10 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
     restart: unless-stopped
+    networks:
+      - ci-net
+
+networks:
+  ci-net:
+    external: true
+    name: ci-net
