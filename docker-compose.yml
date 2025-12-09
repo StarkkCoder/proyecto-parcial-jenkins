@@ -1,0 +1,11 @@
+services:
+  todo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo-api
+    ports:
+      - "8080:8080"      # host:container
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: unless-stopped
