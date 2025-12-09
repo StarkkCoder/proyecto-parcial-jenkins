@@ -9,7 +9,7 @@ pipeline {
     environment {
         APP_NAME = "todo-api"
         DOCKER_IMAGE = "todo-api:latest"
-        HEALTH_URL = "http://localhost:8080/actuator/health"
+        HEALTH_URL = "http://localhost:3000/actuator/health"
         MAIL_ADMIN= "angel_cevallos99@hotmail.com"
     }
 

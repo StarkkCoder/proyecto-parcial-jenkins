@@ -4,7 +4,8 @@ spring:
   mvc:
     problemdetails:
       enabled: true
-
+server:
+  port: 3000
 management:
   endpoints:
     web:
