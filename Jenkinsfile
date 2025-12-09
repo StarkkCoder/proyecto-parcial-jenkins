@@ -7,10 +7,10 @@ pipeline {
     }
 
     environment {
-        APP_NAME = "todo-api"
+        APP_NAME     = "todo-api"
         DOCKER_IMAGE = "todo-api:latest"
-        HEALTH_URL = "http://todo-api:3000/actuator/health"
-        MAIL_ADMIN= "angel_cevallos99@hotmail.com"
+        HEALTH_URL   = "http://todo-api:3000/actuator/health"
+        MAIL_ADMIN   = "angel_cevallos99@hotmail.com"
     }
 
     stages {
@@ -26,6 +26,12 @@ pipeline {
             steps {
                 echo "🧪 Ejecutando tests (unit + integration)..."
                 sh 'mvn -B clean test'
+            }
+            post {
+                always {
+                    echo "📊 Publicando resultados de tests (JUnit)..."
+                    junit 'target/surefire-reports/*.xml'
+                }
             }
         }
 
@@ -55,8 +61,10 @@ pipeline {
             steps {
                 echo "🚀 Desplegando aplicación con Docker Compose..."
 
+                // Detiene stack previo si existe (sin romper el pipeline)
                 sh "docker compose down || true"
 
+                // Levanta la nueva versión
                 sh "docker compose up -d --build"
             }
         }
@@ -78,16 +86,22 @@ pipeline {
 
         success {
             echo "🎉 Pipeline completado con éxito."
-            mail to: 'TU_CORREO',
+            mail to: "${MAIL_ADMIN}",
                  subject: "Jenkins SUCCESS - ${APP_NAME}",
-                 body: "El pipeline terminó correctamente.\nBuild: ${env.BUILD_NUMBER}\nJob: ${env.JOB_NAME}\nURL: ${env.BUILD_URL}"
+                 body: """El pipeline terminó correctamente.
+Build: ${env.BUILD_NUMBER}
+Job:   ${env.JOB_NAME}
+URL:   ${env.BUILD_URL}"""
         }
 
         failure {
             echo "💥 Pipeline falló."
             mail to: "${MAIL_ADMIN}",
                  subject: "Jenkins FAILURE - ${APP_NAME}",
-                 body: "El pipeline falló.\nBuild: ${env.BUILD_NUMBER}\nJob: ${env.JOB_NAME}\nURL: ${env.BUILD_URL}"
+                 body: """El pipeline falló.
+Build: ${env.BUILD_NUMBER}
+Job:   ${env.JOB_NAME}
+URL:   ${env.BUILD_URL}"""
         }
     }
 }
